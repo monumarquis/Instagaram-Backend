@@ -27,7 +27,7 @@ app.get("/", async (req, res) => {
     return res.status(404).send({ message: "Request Not Found" });
   }
   try {
-    const comment = await CommentModel.findOne({ postId });
+    const comment = await CommentModel.find({ post:postId }).populate("user")
     return res.status(200).send(comment);
   } catch (err) {
     return res.status(404).send({ message: err.message });
