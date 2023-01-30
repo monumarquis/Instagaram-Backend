@@ -30,8 +30,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-app.get("/", (req, res) => {
-  res.send("Post Route");
+app.get("/", async (req, res) => {
+  let post = await PostModel.find()
+  res.send({randomPost:post});
 });
 
 app.post("/", async (req, res) => {
