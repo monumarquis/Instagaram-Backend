@@ -1,4 +1,5 @@
 const UserModel = require("./user.model");
+const UserProfileModel = require("./user.profile.model");
 const express = require("express");
 const app = express.Router();
 const bcrypt = require("bcrypt");
@@ -32,7 +33,9 @@ app.post("/signup", async (req, res) => {
   const hash = bcrypt.hashSync(password, 10);
   const user = await UserModel({ username, fullname, email, password: hash });
   user.save();
-
+  // along with userProfile
+  const userProfile = await UserProfileModel({user:user.id,username:user.username})
+  userProfile.save()
   return res
     .status(201)
     .send({ message: "You have Signed up Successfully" });
@@ -55,6 +58,7 @@ app.post("/login", async (req, res) => {
   //    console.log(User)
   try {
     const match = bcrypt.compareSync(password, User.password);
+    const userProfile = await UserProfileModel.findOne({user:User.id})
     // console.log(match);
     if (match) {
       //login
@@ -84,7 +88,7 @@ app.post("/login", async (req, res) => {
       );
       return res
         .status(200)
-        .send({ message: "Login Successfull", token, refresh_token, userId: User.id });
+        .send({ message: "Login Successfull", token, refresh_token, userId: userProfile.id });
     } else {
       return res.status(401).send({ message: "Password is Incorrect" });
     }

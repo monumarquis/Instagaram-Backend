@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const PostSchema = new mongoose.Schema(
+const StorySchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -8,12 +8,11 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     imageUrl: { type: String, required: true },
-    likes: { type: Number, required: true ,min:0},
-    description: { type: String, }
   },
   { versionKey: false, timestamps: true }
+  
 );
 
-const PostModel = new mongoose.model("post", PostSchema);
+const StoryModel = new mongoose.model("story", StorySchema);
 
-module.exports = PostModel;
+module.exports = StoryModel;

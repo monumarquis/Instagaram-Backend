@@ -35,6 +35,15 @@ app.get("/", async (req, res) => {
   res.send({randomPost:post});
 });
 
+app.get("/userPost", async (req, res) => {
+  const {userId} = req.body
+  console.log(userId);
+  if(!userId) return res.status(404).send({ message: "Request Not Found" });
+  let post = await PostModel.find({user:userId})
+  res.send({post});
+});
+
+
 app.post("/", async (req, res) => {
   console.log(req.body);
   try {
