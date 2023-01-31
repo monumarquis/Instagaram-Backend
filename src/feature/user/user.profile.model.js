@@ -7,7 +7,7 @@ const UserProfileSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
-    imageURL: { type: String },
+    imageUrl: { type: String },
     username: { type: String },
     boi: { type: String },
     profession: { type: String }

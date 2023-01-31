@@ -31,15 +31,15 @@ cloudinary.config({
 });
 
 app.get("/", async (req, res) => {
-  let post = await PostModel.find()
+  let post = await PostModel.find().populate("user")
   res.send({ randomPost: post });
 });
 
 app.get("/userPost", async (req, res) => {
-  const { userId } = req.body
-  console.log(userId);
-  if (!userId) return res.status(404).send({ message: "Request Not Found" });
-  let post = await PostModel.find({ user: userId }).populate("user")
+  const { userid } = req.headers
+  console.log(userid);
+  if (!userid) return res.status(404).send({ message: "Request Not Found" });
+  let post = await PostModel.find({ user: userid }).populate("user")
   res.send({ post });
 });
 
