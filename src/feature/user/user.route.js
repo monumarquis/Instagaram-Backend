@@ -64,7 +64,7 @@ app.post("/signup", async (req, res) => {
   const user = await UserModel({ username, fullname, email, password: hash });
   user.save();
   // along with userProfile
-  const userProfile = await UserProfileModel({ user: user.id, username: user.username, boi: "", imageUrl: "", profession: "" })
+  const userProfile = await UserProfileModel({ user: user.id, realname: user.fullname, username: user.username, boi: "", imageUrl: "", profession: "" })
   userProfile.save()
   console.log(userProfile)
   return res
@@ -119,7 +119,7 @@ app.post("/login", async (req, res) => {
       );
       return res
         .status(200)
-        .send({ message: "Login Successfull", token, refresh_token, userId: userProfile.id ,username: userProfile.username});
+        .send({ message: "Login Successfull", token, refresh_token, userId: userProfile.id, username: userProfile.username });
     } else {
       return res.status(401).send({ message: "Password is Incorrect" });
     }
@@ -130,8 +130,8 @@ app.post("/login", async (req, res) => {
 
 app.get('/getProfile', async (req, res) => {
   const { username } = req.headers
-  console.log(userid);
-  if (!userid) return res.status(500).send({ message: "Request not found" })
+  console.log(username);
+  if (!username) return res.status(500).send({ message: "Request not found" })
   try {
     let userProfile = await UserProfileModel.findOne({ username })
     return res.status(200).send(userProfile)

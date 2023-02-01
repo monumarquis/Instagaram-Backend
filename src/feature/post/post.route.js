@@ -3,6 +3,7 @@ const cloudinary = require("cloudinary").v2;
 const express = require("express");
 const app = express.Router();
 const PostModel = require("./post.model");
+const UserProfileModel = require("../user/user.profile.model");
 const opts = {
   overwrite: true,
   invalidate: true,
@@ -15,7 +16,7 @@ const uploadImage = (image) => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(image, opts, (error, result) => {
       if (result && result.secure_url) {
-        console.log(result.secure_url);
+        // console.log(result.secure_url);
         return resolve(result.secure_url);
       }
       console.log(error.message);
@@ -36,10 +37,11 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/userPost", async (req, res) => {
-  const { userid } = req.headers
-  console.log(userid);
-  if (!userid) return res.status(404).send({ message: "Request Not Found" });
-  let post = await PostModel.find({ user: userid }).populate("user")
+  const { username } = req.headers
+  console.log(username);
+  const userprofile= await UserProfileModel.findOne({username})
+  if (!username) return res.status(404).send({ message: "Request Not Found" });
+  let post = await PostModel.find({ user:userprofile.id }).populate("user")
   res.send({ post });
 });
 
@@ -47,12 +49,12 @@ app.get("/userPost", async (req, res) => {
 app.post("/", async (req, res) => {
   console.log(req.body);
   try {
-    const { imageUrl, desc = "", userId, likes } = req.body;
+    const { imageUrl, desc = "", userId, likes,location } = req.body;
     if (!imageUrl || !userId)
       return res.status(404).send({ message: "Please Select Image" });
     uploadImage(imageUrl)
       .then(async (url) => {
-        let post = await PostModel({ user: userId, imageUrl: url, description: desc, likes })
+        let post = await PostModel({ user: userId, imageUrl: url, description: desc, likes,location })
         post.save()
         return res.status(201).send({ message: "Post Uploaded" });
       })

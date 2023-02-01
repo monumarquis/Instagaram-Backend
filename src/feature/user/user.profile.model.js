@@ -9,6 +9,7 @@ const UserProfileSchema = new mongoose.Schema(
     },
     imageUrl: { type: String },
     username: { type: String },
+    realname: { type: String },
     boi: { type: String },
     profession: { type: String }
   },
