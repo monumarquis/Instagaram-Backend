@@ -39,9 +39,9 @@ app.get("/", async (req, res) => {
 app.get("/userPost", async (req, res) => {
   const { username } = req.headers
   console.log(username);
-  const userprofile= await UserProfileModel.findOne({username})
+  const userprofile = await UserProfileModel.findOne({ username })
   if (!username) return res.status(404).send({ message: "Request Not Found" });
-  let post = await PostModel.find({ user:userprofile.id }).populate("user")
+  let post = await PostModel.find({ user: userprofile.id }).populate("user")
   res.send({ post });
 });
 
@@ -49,12 +49,12 @@ app.get("/userPost", async (req, res) => {
 app.post("/", async (req, res) => {
   console.log(req.body);
   try {
-    const { imageUrl, desc = "", userId, likes,location } = req.body;
+    const { imageUrl, desc = "", userId, likes, location } = req.body;
     if (!imageUrl || !userId)
       return res.status(404).send({ message: "Please Select Image" });
     uploadImage(imageUrl)
       .then(async (url) => {
-        let post = await PostModel({ user: userId, imageUrl: url, description: desc, likes,location })
+        let post = await PostModel({ user: userId, imageUrl: url, description: desc, likes, location })
         post.save()
         return res.status(201).send({ message: "Post Uploaded" });
       })
@@ -67,14 +67,11 @@ app.post("/", async (req, res) => {
 });
 
 app.patch("/", async (req, res) => {
-  const { likes, postId, userId } = req.body;
+  const { likes, postId } = req.body;
   if (!likes) return res.status(404).res.send({ message: "Body is empty" });
   try {
-    let likesUpdate = await PostModel.findOneAndUpdate(
-      { post: postId, user: userId },
-      { likes },
-      { new: true }
-    );
+    let likesUpdate = await PostModel.findByIdAndUpdate(postId, { likes }, { new: true });
+    res.status(201).send({ message: "Ok", likesUpdate })
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

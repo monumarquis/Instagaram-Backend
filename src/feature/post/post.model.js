@@ -9,7 +9,8 @@ const PostSchema = new mongoose.Schema(
     },
     imageUrl: { type: String, required: true },
     likes: { type: Number, required: true ,min:0},
-    description: { type: String, }
+    description: { type: String, },
+    location: { type: String, },
   },
   { versionKey: false, timestamps: true }
 );
