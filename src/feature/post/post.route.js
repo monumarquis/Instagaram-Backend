@@ -31,10 +31,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
+// get All Posts
 app.get("/", async (req, res) => {
   let post = await PostModel.find().populate("user")
-  res.send({ randomPost: post });
+  return res.status(200).send({ randomPost: post });
 });
+
+// particular user's all post
 
 app.get("/userPost", async (req, res) => {
   const { username } = req.headers
@@ -42,19 +46,19 @@ app.get("/userPost", async (req, res) => {
   const userprofile = await UserProfileModel.findOne({ username })
   if (!username) return res.status(404).send({ message: "Request Not Found" });
   let post = await PostModel.find({ user: userprofile.id }).populate("user")
-  res.send({ post });
+  return res.status(200).send({ post });
 });
 
-
+// upload image
 app.post("/", async (req, res) => {
   console.log(req.body);
   try {
-    const { imageUrl, desc = "", userId, likes, location } = req.body;
+    const { imageUrl, desc = "", userId, location } = req.body;
     if (!imageUrl || !userId)
       return res.status(404).send({ message: "Please Select Image" });
     uploadImage(imageUrl)
       .then(async (url) => {
-        let post = await PostModel({ user: userId, imageUrl: url, description: desc, likes, location })
+        let post = await PostModel({ user: userId, imageUrl: url, description: desc, location })
         post.save()
         return res.status(201).send({ message: "Post Uploaded" });
       })
@@ -66,14 +70,20 @@ app.post("/", async (req, res) => {
   }
 });
 
-app.patch("/", async (req, res) => {
-  const { likes, postId } = req.body;
-  if (!likes) return res.status(404).res.send({ message: "Body is empty" });
+//like / dislike a post
+
+app.put("/:id/like", async (req, res) => {
   try {
-    let likesUpdate = await PostModel.findByIdAndUpdate(postId, { likes }, { new: true });
-    res.status(201).send({ message: "Ok", likesUpdate })
+    const post = await PostModel.findById(req.params.id);
+    if (!post.likes.includes(req.body.userId)) {
+      await post.updateOne({ $push: { likes: req.body.userId } });
+      return res.status(200).send("The post has been liked");
+    } else {
+      await post.updateOne({ $pull: { likes: req.body.userId } });
+      return res.status(200).send("The post has been disliked");
+    }
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    return res.status(500).send(err);
   }
 });
 module.exports = app;

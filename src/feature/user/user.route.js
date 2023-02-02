@@ -36,7 +36,7 @@ cloudinary.config({
 });
 
 
-
+// All Users
 app.get("/", async (req, res) => {
   const user = await UserModel.find({});
   return res.status(201).send(user);
@@ -128,6 +128,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// get user details individully
 app.get('/getProfile', async (req, res) => {
   const { username } = req.headers
   console.log(username);
@@ -162,4 +163,48 @@ app.patch('/getProfile', async (req, res) => {
   }
 })
 
+//follow a user
+
+app.put("/:id/follow", async (req, res) => {
+  if (req.body.userId !== req.params.id) {
+    try {
+      const user = await UserProfileModel.findById(req.params.id);
+      const currentUser = await UserProfileModel.findById(req.body.userId);
+      console.log(currentUser,user);
+      if (!user.followers.includes(req.body.userId)) {
+        await user.updateOne({ $push: { followers: req.body.userId } });
+        await currentUser.updateOne({ $push: { following: req.params.id } });
+        return res.status(200).send("user has been followed");
+      } else {
+        return res.status(403).send("you allready follow this user");
+      }
+    } catch (err) {
+      return res.status(500).send(err);
+    }
+  } else {
+    return res.status(403).send("you cant follow yourself");
+  }
+});
+
+//unfollow a user
+
+app.put("/:id/unfollow", async (req, res) => {
+  if (req.body.userId !== req.params.id) {
+    try {
+      const user = await UserProfileModel.findById(req.params.id);
+      const currentUser = await UserProfileModel.findById(req.body.userId);
+      if (user.followers.includes(req.body.userId)) {
+        await user.updateOne({ $pull: { followers: req.body.userId } });
+        await currentUser.updateOne({ $pull: { following: req.params.id } });
+        return res.status(200).send("user has been unfollowed");
+      } else {
+        return res.status(403).send("you dont follow this user");
+      }
+    } catch (err) {
+      return res.status(500).send(err);
+    }
+  } else {
+    return res.status(403).send("you cant unfollow yourself");
+  }
+});
 module.exports = app;
