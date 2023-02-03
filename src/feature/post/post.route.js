@@ -34,7 +34,7 @@ cloudinary.config({
 
 // get All Posts
 app.get("/", async (req, res) => {
-  let post = await PostModel.find().populate("user")
+  let post = await PostModel.find().populate(["user", "likes"])
   return res.status(200).send({ randomPost: post });
 });
 
@@ -45,7 +45,7 @@ app.get("/userPost", async (req, res) => {
   console.log(username);
   const userprofile = await UserProfileModel.findOne({ username })
   if (!username) return res.status(404).send({ message: "Request Not Found" });
-  let post = await PostModel.find({ user: userprofile.id }).populate("user")
+  let post = await PostModel.find({ user: userprofile.id }).populate(["user", "likes"])
   return res.status(200).send({ post });
 });
 

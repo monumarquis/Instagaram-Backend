@@ -10,7 +10,7 @@ const CommentSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "userProfile", required: true
         },
-        comment_desc: { type: String, required: true }
+        comment: { type: String, required: true }
     },
     { versionKey: false, timestamps: true }
 );

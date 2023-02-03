@@ -134,7 +134,7 @@ app.get('/getProfile', async (req, res) => {
   console.log(username);
   if (!username) return res.status(500).send({ message: "Request not found" })
   try {
-    let userProfile = await UserProfileModel.findOne({ username })
+    let userProfile = await UserProfileModel.findOne({ username }).populate(["followers","following"])
     return res.status(200).send(userProfile)
   }
   catch (err) {

@@ -15,7 +15,7 @@ app.post("/", async (req, res) => {
       comment: comment_desc,
     });
     comment.save();
-    return res.status(201).send({ cart, message: "Comment Added" });
+    return res.status(201).send({ comment, message: "Comment Posted" });
   } catch (err) {
     return res.status(404).send({ message: err.message });
   }

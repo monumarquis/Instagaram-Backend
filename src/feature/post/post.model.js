@@ -8,7 +8,7 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     imageUrl: { type: String, required: true },
-    likes: { type: Array, default: [] },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userProfile', default: [] }],
     description: { type: String, },
     location: { type: String, },
   },

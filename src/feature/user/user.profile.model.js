@@ -10,8 +10,8 @@ const UserProfileSchema = new mongoose.Schema(
     imageUrl: { type: String },
     username: { type: String },
     realname: { type: String },
-    followers: { type: Array, default: [] },
-    following: { type: Array, default: [] },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userProfile', default: [] }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userProfile', default: [] }],
     boi: { type: String },
     profession: { type: String }
   },
