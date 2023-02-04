@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
 const SECRET_REFRESH_TOKEN = process.env.SECRET_REFRESH_TOKEN;
+
 const opts = {
   overwrite: true,
   invalidate: true,
@@ -36,10 +37,20 @@ cloudinary.config({
 });
 
 
-// All Users
+// Sugeestion Users
 app.get("/", async (req, res) => {
-  const user = await UserModel.find({});
-  return res.status(201).send(user);
+  const { userid } = req.headers
+  const user = await UserProfileModel.find({})
+  // console.log(req.headers)
+  // console.log(user)
+  let sugesstionuser = user.filter((el) => {
+    if (!el.followers.includes(userid) && el.id !== userid) {
+      return true
+    }
+    else return false
+  })
+  // console.log(sugesstionuser)
+  return res.status(201).send(sugesstionuser);
 });
 
 // signup route
@@ -134,15 +145,15 @@ app.get('/getProfile', async (req, res) => {
   console.log(username);
   if (!username) return res.status(500).send({ message: "Request not found" })
   try {
-    let userProfile = await UserProfileModel.findOne({ username }).populate(["followers","following"])
+    let userProfile = await UserProfileModel.findOne({ username }).populate(["followers", "following"])
     return res.status(200).send(userProfile)
   }
   catch (err) {
     return res.status(401).send({ message: "Request Not Found" });
   }
 })
-// Bio details --> DP , Followers ,Following ,Boi , Feed
 
+// Bio details --> DP , Followers ,Following ,Boi , Feed
 app.patch('/getProfile', async (req, res) => {
   const { userid, imageUrl = "", boi = "", profession = "" } = req.body
   console.log(userid);
@@ -164,13 +175,12 @@ app.patch('/getProfile', async (req, res) => {
 })
 
 //follow a user
-
 app.put("/:id/follow", async (req, res) => {
   if (req.body.userId !== req.params.id) {
     try {
       const user = await UserProfileModel.findById(req.params.id);
       const currentUser = await UserProfileModel.findById(req.body.userId);
-      console.log(currentUser,user);
+      console.log(currentUser, user);
       if (!user.followers.includes(req.body.userId)) {
         await user.updateOne({ $push: { followers: req.body.userId } });
         await currentUser.updateOne({ $push: { following: req.params.id } });
@@ -187,7 +197,6 @@ app.put("/:id/follow", async (req, res) => {
 });
 
 //unfollow a user
-
 app.put("/:id/unfollow", async (req, res) => {
   if (req.body.userId !== req.params.id) {
     try {
@@ -207,4 +216,5 @@ app.put("/:id/unfollow", async (req, res) => {
     return res.status(403).send("you cant unfollow yourself");
   }
 });
+
 module.exports = app;

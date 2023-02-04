@@ -22,12 +22,12 @@ app.post("/", async (req, res) => {
 });
 
 app.get("/", async (req, res) => {
-  const { postId } = req.body;
-  if (!userId || !postId) {
+  const { postid } = req.headers;
+  if ( !postid) {
     return res.status(404).send({ message: "Request Not Found" });
   }
   try {
-    const comment = await CommentModel.find({ post:postId }).populate("user")
+    const comment = await CommentModel.find({ post:postid }).populate("user")
     return res.status(200).send(comment);
   } catch (err) {
     return res.status(404).send({ message: err.message });
