@@ -160,9 +160,9 @@ app.patch('/getProfile', async (req, res) => {
   // if (!useId || !username || !boi || !realname) return res.status(500).send({ message: "Request not found" })
   try {
 
-   let user =  await UserProfileModel.findOneAndUpdate({ id: useId }, { username, boi, realname }, { new: true })
+    let user = await UserProfileModel.findOneAndUpdate({ id: useId }, { username, boi, realname }, { new: true })
     await UserModel.findOneAndUpdate({ username }, { username, fullname: realname }, { new: true })
-    return res.status(200).send({user, message: "Profile Updated" })
+    return res.status(200).send({ user, message: "Profile Updated" })
 
   }
   catch (err) {
@@ -229,6 +229,20 @@ app.put("/:id/profileImage", async (req, res) => {
       .catch((err) => {
         return res.status(500).send({ message: err.message });
       });
+
+  }
+  catch (err) {
+    return res.status(401).send({ message: "Invalid request" })
+  }
+})
+app.put("/:id/profileImage/delete", async (req, res) => {
+  const { id } = req.params
+  console.log(id)
+  if (!id ) return res.status(404).send({ message: "request not found" })
+  try {
+
+    let userProfile = await UserProfileModel.findOneAndUpdate({ _id: id }, { imageUrl: "" }, { new: true })
+    return res.status(200).send({ message: "Image Deleted successfully" });
 
   }
   catch (err) {
