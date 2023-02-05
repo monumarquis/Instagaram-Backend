@@ -155,18 +155,14 @@ app.get('/getProfile', async (req, res) => {
 
 // Bio details --> DP , Followers ,Following ,Boi , Feed
 app.patch('/getProfile', async (req, res) => {
-  const { userid, imageUrl = "", boi = "", profession = "" } = req.body
-  console.log(userid);
-  if (!userid || !imageUrl || !boi || !profession) return res.status(500).send({ message: "Request not found" })
+  const { useId, boi, realname, username } = req.body
+  console.log(req.body);
+  // if (!useId || !username || !boi || !realname) return res.status(500).send({ message: "Request not found" })
   try {
-    uploadImage(imageUrl)
-      .then(async (url) => {
-        let userProfile = await UserProfileModel.findOneAndUpdate({ _id: userid }, { imageUrl, boi, profession }, { new: true })
-        return res.status(200).send({ message: "Profile Updated" })
-      })
-      .catch((err) => {
-        return res.status(500).send({ message: err.message });
-      });
+
+   let user =  await UserProfileModel.findOneAndUpdate({ id: useId }, { username, boi, realname }, { new: true })
+    await UserModel.findOneAndUpdate({ username }, { username, fullname: realname }, { new: true })
+    return res.status(200).send({user, message: "Profile Updated" })
 
   }
   catch (err) {
@@ -216,5 +212,29 @@ app.put("/:id/unfollow", async (req, res) => {
     return res.status(403).send("you cant unfollow yourself");
   }
 });
+
+// Profile image change
+app.put("/:id/profileImage", async (req, res) => {
+  const { id } = req.params
+  const { imageUrl } = req.body
+  console.log(id)
+  if (!id || !imageUrl) return res.status(404).send({ message: "request not found" })
+  try {
+    // let userProfile = await UserProfileModel.findOne({ _id: id })
+    uploadImage(imageUrl)
+      .then(async (url) => {
+        let userProfile = await UserProfileModel.findOneAndUpdate({ _id: id }, { imageUrl: url }, { new: true })
+        return res.status(200).send({ message: "Image uploaded successfully" });
+      })
+      .catch((err) => {
+        return res.status(500).send({ message: err.message });
+      });
+
+  }
+  catch (err) {
+    return res.status(401).send({ message: "Invalid request" })
+  }
+})
+
 
 module.exports = app;
