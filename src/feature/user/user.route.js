@@ -141,11 +141,24 @@ app.post("/login", async (req, res) => {
 
 // get user details individully
 app.get('/getProfile', async (req, res) => {
+  const { userid } = req.headers
+  console.log(userid);
+  if (!userid) return res.status(500).send({ message: "Request not found" })
+  try {
+    let userProfile = await UserProfileModel.findById(userid).populate(["followers", "following"])
+    return res.status(200).send(userProfile)
+  }
+  catch (err) {
+    return res.status(401).send({ message: "Request Not Found" });
+  }
+})
+app.get('/getProfile/username', async (req, res) => {
   const { username } = req.headers
-  console.log(username);
+  console.log(req.headers);
   if (!username) return res.status(500).send({ message: "Request not found" })
   try {
     let userProfile = await UserProfileModel.findOne({ username }).populate(["followers", "following"])
+    console.log(userProfile);
     return res.status(200).send(userProfile)
   }
   catch (err) {
@@ -161,7 +174,9 @@ app.patch('/getProfile', async (req, res) => {
   try {
 
     let user = await UserProfileModel.findOneAndUpdate({ id: useId }, { username, boi, realname }, { new: true })
-    await UserModel.findOneAndUpdate({ username }, { username, fullname: realname }, { new: true })
+    console.log(user.user);
+    let mainuser = await UserModel.findByIdAndUpdate(user.user, { username, fullnaame: realname }, { new: true })
+    console.log(mainuser)
     return res.status(200).send({ user, message: "Profile Updated" })
 
   }
@@ -238,7 +253,7 @@ app.put("/:id/profileImage", async (req, res) => {
 app.put("/:id/profileImage/delete", async (req, res) => {
   const { id } = req.params
   console.log(id)
-  if (!id ) return res.status(404).send({ message: "request not found" })
+  if (!id) return res.status(404).send({ message: "request not found" })
   try {
 
     let userProfile = await UserProfileModel.findOneAndUpdate({ _id: id }, { imageUrl: "" }, { new: true })
