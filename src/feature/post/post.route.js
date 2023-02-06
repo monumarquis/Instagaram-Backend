@@ -4,6 +4,7 @@ const express = require("express");
 const app = express.Router();
 const PostModel = require("./post.model");
 const UserProfileModel = require("../user/user.profile.model");
+const CommentModel = require("../comment/comment.model");
 const opts = {
   overwrite: true,
   invalidate: true,
@@ -86,4 +87,19 @@ app.put("/:id/like", async (req, res) => {
     return res.status(500).send(err);
   }
 });
+
+// delete post
+app.delete("/:postid", async (req, res) => {
+  const { postid } = req.params
+  console.log(req.params)
+  if (!postid) return res.status(500).send({ message: "Request Not Found" })
+  try {
+    const post = await PostModel.findByIdAndDelete(postid)
+    const comment = await CommentModel.deleteMany({ post: postid })
+    return res.status(200).send({ post, comment ,message:"Post Deleted"});
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+})
+
 module.exports = app;

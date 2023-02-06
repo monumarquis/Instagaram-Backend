@@ -152,6 +152,21 @@ app.get('/getProfile', async (req, res) => {
     return res.status(401).send({ message: "Request Not Found" });
   }
 })
+// search User
+app.get("/Search/:user", async (req, res) => {
+  let { user } = req.params
+  if (!user) return res.status(200).send([])
+  try {
+    console.log(user)
+    const regex = new RegExp(user, 'i')
+    let AllUsers = await UserProfileModel.find({ username: { $regex: regex } })
+    return res.status(200).send(AllUsers)
+  }
+  catch (err) {
+    return res.status(404).send({ message: "Request Not Found" });
+  }
+})
+
 app.get('/getProfile/username', async (req, res) => {
   const { username } = req.headers
   console.log(req.headers);
