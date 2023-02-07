@@ -40,7 +40,7 @@ cloudinary.config({
 // Sugeestion Users
 app.get("/", async (req, res) => {
   const { userid } = req.headers
-  const user = await UserProfileModel.find({})
+  const user = await UserProfileModel.find({}).limit(10)
   // console.log(req.headers)
   // console.log(user)
   let sugesstionuser = user.filter((el) => {
@@ -139,7 +139,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// get user details individully
+// get user details individually
 app.get('/getProfile', async (req, res) => {
   const { userid } = req.headers
   console.log(userid);
@@ -159,7 +159,7 @@ app.get("/Search/:user", async (req, res) => {
   try {
     console.log(user)
     const regex = new RegExp(user, 'i')
-    let AllUsers = await UserProfileModel.find({ username: { $regex: regex } })
+    let AllUsers = await UserProfileModel.find({ username: { $regex: regex } }).limit(10)
     return res.status(200).send(AllUsers)
   }
   catch (err) {
